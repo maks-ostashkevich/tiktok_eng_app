@@ -1,0 +1,27 @@
+# Ignoring OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignoring Python bytecode files
+__pycache__/
+*.py[cod]
+
+# Ignoring virtual environment directories
+venv/
+env/
+
+# Ignoring log files and databases
+*.log
+*.sqlite3
+
+# Ignoring IDE files
+.idea/
+.vscode/
+*.swp
+
+# Ignoring build directories
+build/
+dist/
+
+# Ignoring node_modules for Node.js projects
+node_modules/
