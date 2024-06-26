@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise Feed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+        }
+        .exercise-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #ccc;
+        }
+        .swiper-container {
+          width: 100%;
+          height: 100%;
+        }
+        .swiper-slide {
+          background: #fff;
+          overflow: hidden;
+        }
+        .swiper-slide video {
+          width: 100%;
+        }
+        .exercise {
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+</head>
+<body>
+    <div class="infinite-container"></div>
+
+    <script>
+        $(document).ready(function() {
+
+            function renderExercise(data) {
+                var exerciseHtml = '<div class="exercise-container">';
+
+                exerciseHtml += '<div class="swiper-container">';
+
+                exerciseHtml += '<div class="swiper-wrapper" navigation="true">';
+                data.videos.forEach(function(video) {
+                    exerciseHtml += '<div class="swiper-slide">';
+                    exerciseHtml += '<video controls><source src="' + video.url + '" type="video/mp4"></video>';
+                    exerciseHtml += '</div>';
+                });
+                exerciseHtml += '</div>';
+
+                exerciseHtml += '<div class="swiper-button-prev"></div>';
+                exerciseHtml += '<div class="swiper-button-next"></div>';
+
+                exerciseHtml += '</div>';
+
+                exerciseHtml += '<div class="exercise">';
+                switch (data.type) {
+                    case 'antonym_synonym':
+                        exerciseHtml += '<h3>' + data.question + '</h3>';
+                        exerciseHtml += '<ul>';
+                        data.options.forEach(function(option) {
+                            exerciseHtml += '<li>' + option + '</li>';
+                        });
+                        exerciseHtml += '</ul>';
+                        break;
+                    case 'grammar':
+                        exerciseHtml += '<h3>' + data.question + '</h3>';
+                        exerciseHtml += '<ul>';
+                        data.options.forEach(function(option) {
+                            exerciseHtml += '<li>' + option + '</li>';
+                        });
+                        exerciseHtml += '</ul>';
+                        break;
+                    case 'pronunciation':
+                        exerciseHtml += '<h3>Pronounce this word: ' + data.word + '</h3>';
+                        break;
+                    case 'idiom':
+                        exerciseHtml += '<h3>' + data.question + '</h3>';
+                        exerciseHtml += '<ul>';
+                        data.options.forEach(function(option) {
+                            exerciseHtml += '<li>' + option + '</li>';
+                        });
+                        exerciseHtml += '</ul>';
+                        break;
+                    case 'vocabulary':
+                        exerciseHtml += '<h3>' + data.question_1 + '</h3>';
+                        exerciseHtml += '<ul>';
+                        data.options_1.forEach(function(option) {
+                            exerciseHtml += '<li>' + option + '</li>';
+                        });
+                        exerciseHtml += '</ul>';
+                        exerciseHtml += '<h3>' + data.question_2 + '</h3>';
+                        exerciseHtml += '<ul>';
+                        data.options_2.forEach(function(option) {
+                            exerciseHtml += '<li>' + option + '</li>';
+                        });
+                        exerciseHtml += '</ul>';
+                        break;
+                    default:
+                        exerciseHtml += '<p>Unknown exercise type</p>';
+                }
+                exerciseHtml += '</div>';
+                exerciseHtml += '</div>';
+
+                $('.infinite-container').html(exerciseHtml);
+
+                // Initialize Swiper after rendering new content
+                var swiper = new Swiper('.swiper-container', {
+                    navigation: {
+                        nextEl: '.swiper-button-next',
+                        prevEl: '.swiper-button-prev',
+                    },
+                });
+            }
+
+            function loadExercise() {
+                $.ajax({
+                    url: window.location.href,
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.exercise) {
+                            renderExercise(data.exercise);
+
+                            if (data.has_next) {
+                                waypoint.enable();
+                            } else {
+                                waypoint.disable();
+                            }
+                        }
+                    }
+                });
+            }
+
+            var waypoint = new Waypoint({
+                element: $('.infinite-container')[0],
+                handler: function(direction) {
+                    if (direction === 'down') {
+                        waypoint.disable();
+                        loadExercise();
+                    }
+                },
+                offset: 'bottom-in-view'
+            });
+
+            // Load initial exercise
+            loadExercise();
+        });
+    </script>
+</body>
+</html>

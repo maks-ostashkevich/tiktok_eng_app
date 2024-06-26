@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exercise Feed</title>
+</head>
+<body>
+    <h1>Exercise Feed</h1>
+    <div id="exercise-feed">
+        {% for exercise in antonym_synonym_exercises %}
+            <div class="exercise">
+                <h2>Antonym or Synonym</h2>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video_1.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video_2.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p>{{ exercise.question }}</p>
+                <form method="post" action="{% url 'submit_antonym_synonym' exercise.id %}">
+                    {% csrf_token %}
+                    {% for option in exercise.options %}
+                        <button type="submit" name="answer" value="{{ option }}">{{ option }}</button>
+                    {% endfor %}
+                </form>
+            </div>
+        {% endfor %}
+
+        {% for exercise in grammar_exercises %}
+            <div class="exercise">
+                <h2>Grammar Exercise</h2>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video_1.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video_2.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video_3.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p>{{ exercise.question }}</p>
+                <form method="post" action="{% url 'submit_grammar' exercise.id %}">
+                    {% csrf_token %}
+                    {% for option in exercise.options %}
+                        <button type="submit" name="answer" value="{{ option }}">{{ option }}</button>
+                    {% endfor %}
+                </form>
+            </div>
+        {% endfor %}
+
+        {% for exercise in pronunciation_exercises %}
+            <div class="exercise">
+                <h2>Pronunciation Exercise</h2>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video_1.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video_2.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video_3.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p>Pronounce the word: <strong>{{ exercise.word }}</strong></p>
+                <!-- Implement a method to record and evaluate the user's pronunciation -->
+            </div>
+        {% endfor %}
+
+        {% for exercise in idiom_exercises %}
+            <div class="exercise">
+                <h2>Idiom Exercise</h2>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video_1.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video_2.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video_3.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video_4.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p>{{ exercise.question }}</p>
+                <form method="post" action="{% url 'submit_idiom' exercise.id %}">
+                    {% csrf_token %}
+                    {% for option in exercise.options %}
+                        <button type="submit" name="answer" value="{{ option }}">{{ option }}</button>
+                    {% endfor %}
+                </form>
+            </div>
+        {% endfor %}
+
+        {% for exercise in vocabulary_exercises %}
+            <div class="exercise">
+                <h2>Vocabulary Exercise</h2>
+                <video width="320" height="240" controls>
+                    <source src="{{ exercise.video.video_file.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <p>{{ exercise.question_1 }}</p>
+                <form method="post" action="{% url 'submit_vocabulary' exercise.id %}">
+                    {% csrf_token %}
+                    {% for option in exercise.options_1 %}
+                        <button type="submit" name="answer" value="{{ option }}">{{ option }}</button>
+                    {% endfor %}
+                </form>
+                <p>{{ exercise.question_2 }}</p>
+                <form method="post" action="{% url 'submit_vocabulary' exercise.id %}">
+                    {% csrf_token %}
+                    {% for option in exercise.options_2 %}
+                        <button type="submit" name="answer" value="{{ option }}">{{ option }}</button>
+                    {% endfor %}
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

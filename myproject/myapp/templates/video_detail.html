@@ -1,0 +1,23 @@
+<!-- В файле myapp/templates/video_detail.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ video.title }}</title>
+</head>
+<body>
+    <h1>{{ video.title }}</h1>
+    <p>Description: {{ video.description }}</p>
+    <video width="320" height="240" controls>
+        <source src="{{ video.video_url }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <h2>Exercises</h2>
+    <ul>
+        {% for exercise in video.exercises.all %}
+        <li>{{ exercise.question }} - {{ exercise.answer }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
