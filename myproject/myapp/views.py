@@ -77,9 +77,9 @@ def create_exercises(request):
         exercise_type='antonym_synonym',
         video_1=video2,
         video_2=video1,
-        question='Are these words antonyms or synonyms?',
-        options=json.dumps(['antonym', 'synonym']),
-        answer='synonym'
+        question='Are the words \"keep\" and \"continue\" antonyms or synonyms?',
+        options=json.dumps(['antonyms', 'synonyms']),
+        answer='synonyms'
     )
 
     # Create GrammarExercise
@@ -89,8 +89,8 @@ def create_exercises(request):
         video_2=video,
         video_3=video1,
         question='Which sentence is grammatically correct?',
-        options=json.dumps(['Option 1', 'Option 2', 'Option 3']),
-        correct_option='Option 1'
+        options=json.dumps(["I've just come", 'I had just come', 'I done just come']),
+        correct_option="I've just come"
     )
 
     # Create PronunciationExercise
@@ -99,7 +99,7 @@ def create_exercises(request):
         video_1=video1,
         video_2=video2,
         video_3=video,
-        word='example'
+        word='Ultimate'
     )
 
     # Create IdiomExercise
@@ -109,23 +109,23 @@ def create_exercises(request):
         video_2=video1,
         video_3=video2,
         video_4=video,
-        question='What do these idioms mean?',
-        options=json.dumps(['Option 1', 'Option 2', 'Option 3', 'Option 4']),
-        correct_option='Option 1'
+        question='What do the idioms in the videos mean?',
+        options=json.dumps(['To be very rich', "It's very cheap", "It's dangerous", "It's dangerous"]),
+        correct_option='To be very rich'
     )
 
     # Create VocabularyExercise
     VocabularyExercise.objects.create(
         exercise_type='vocabulary',
         video=video,
-        word_1='example_word_1',
-        word_2='example_word_2',
+        word_1='ensure',
+        word_2='insure',
         question_1='What does this word mean?',
         question_2='What does this word mean?',
-        options_1=json.dumps(['Option 1', 'Option 2', 'Option 3']),
-        options_2=json.dumps(['Option 1', 'Option 2', 'Option 3']),
-        correct_option_1='Option 1',
-        correct_option_2='Option 1'
+        options_1=json.dumps(['Guarantee', 'Deny', 'Improve']),
+        options_2=json.dumps(['Make an insurance', 'Drive', 'Leave']),
+        correct_option_1='Guarantee',
+        correct_option_2='Make an insurance'
     )
 
     return redirect('exercise_feed')

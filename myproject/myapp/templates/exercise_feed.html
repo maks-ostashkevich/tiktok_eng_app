@@ -11,30 +11,126 @@
             padding: 0;
             font-family: Arial, sans-serif;
             overflow-x: hidden;
+            overflow-y: auto;
         }
         .exercise-container {
+            height: 1000px;
             width: 100%;
-            height: 100vh;
+            max-width: 600px; /* Максимальная ширина контейнера */
+            margin: 0 auto; /* Центрирование контейнера */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             border-bottom: 1px solid #ccc;
+            box-sizing: border-box;
+            padding: 10px;
+            margin-bottom: 20px;
+
+            position: relative; /* !!! Добавлено позиционирование */
         }
         .swiper-container {
-          width: 100%;
-          height: 100%;
+            display: flex;
+            width: 100%;
+            height: 400px; /* Адаптация высоты под содержимое */
+            margin-bottom: 10px;
+            overflow: hidden;
         }
         .swiper-slide {
-          background: #fff;
-          overflow: hidden;
+            background: #fff;
+            overflow: hidden;
+            height: 100%;
         }
         .swiper-slide video {
-          width: 100%;
+            width: 100%;
+            height: 100%;
         }
         .exercise {
-            margin-top: 10px;
+            width: 100%;
             text-align: center;
+            box-sizing: border-box;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .option-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .option-btn:hover {
+            background-color: #e0e0e0;
+        }
+        .submit-answer {
+            padding: 12px 24px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .submit-answer:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* Позиционирование кнопок навигации */
+        .swiper-button-prev,
+        .swiper-button-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10; /* Поднимаем кнопки наверх */
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .swiper-button-prev {
+            left: 10px;
+        }
+        .swiper-button-next {
+            right: 10px;
+        }
+
+
+        /* Медиа-запросы для адаптации под мобильные устройства */
+        @media (max-width: 768px) {
+            .exercise-container {
+                padding: 5px;
+            }
+            .swiper-slide video {
+                height: auto;
+            }
+            .submit-answer {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
@@ -45,118 +141,172 @@
     <div class="infinite-container"></div>
 
     <script>
-        $(document).ready(function() {
+    $(document).ready(function() {
+        var selectedAnswer = null;
+        var waypoint = null;
+        var loading = false;
+        var firstLoad = true; // Флаг для первой загрузки
 
-            function renderExercise(data) {
-                var exerciseHtml = '<div class="exercise-container">';
+        function renderExercise(data) {
+            var exerciseHtml = '<div class="exercise-container">';
 
-                exerciseHtml += '<div class="swiper-container">';
+            exerciseHtml += '<div class="swiper-container">';
+            exerciseHtml += '<div class="swiper-wrapper" navigation="true">';
+            data.videos.forEach(function(video) {
+                exerciseHtml += '<div class="swiper-slide">';
+                exerciseHtml += '<video controls><source src="' + video.url + '" type="video/mp4"></video>';
+                exerciseHtml += '</div>';
+            });
+            exerciseHtml += '</div>';
+            exerciseHtml += '<div class="swiper-button-prev"></div>';
+            exerciseHtml += '<div class="swiper-button-next"></div>';
+            exerciseHtml += '</div>';
 
-                exerciseHtml += '<div class="swiper-wrapper" navigation="true">';
-                data.videos.forEach(function(video) {
-                    exerciseHtml += '<div class="swiper-slide">';
-                    exerciseHtml += '<video controls><source src="' + video.url + '" type="video/mp4"></video>';
+            exerciseHtml += '<div class="exercise">';
+            switch (data.type) {
+                case 'antonym_synonym':
+                    exerciseHtml += '<h3>' + data.question + '</h3>';
+                    exerciseHtml += '<div class="options">';
+                    data.options.forEach(function(option) {
+                        exerciseHtml += '<div class="option-btn" data-answer="' + option + '">' + option + '</div>';
+                    });
                     exerciseHtml += '</div>';
-                });
-                exerciseHtml += '</div>';
+                    break;
+                case 'grammar':
+                    exerciseHtml += '<h3>' + data.question + '</h3>';
+                    exerciseHtml += '<div class="options">';
+                    data.options.forEach(function(option) {
+                        exerciseHtml += '<div class="option-btn" data-answer="' + option + '">' + option + '</div>';
+                    });
+                    exerciseHtml += '</div>';
+                    break;
+                case 'pronunciation':
+                    exerciseHtml += '<h3>Pronounce this word: ' + data.word + '</h3>';
+                    break;
+                case 'idiom':
+                    exerciseHtml += '<h3>' + data.question + '</h3>';
+                    exerciseHtml += '<div class="options">';
+                    data.options.forEach(function(option) {
+                        exerciseHtml += '<div class="option-btn" data-answer="' + option + '">' + option + '</div>';
+                    });
+                    exerciseHtml += '</div>';
+                    break;
+                case 'vocabulary':
+                    exerciseHtml += '<h3>' + data.question_1 + '</h3>';
+                    exerciseHtml += '<div class="options">';
+                    data.options_1.forEach(function(option) {
+                        exerciseHtml += '<div class="option-btn" data-answer="' + option + '">' + option + '</div>';
+                    });
+                    exerciseHtml += '</div>';
+                    exerciseHtml += '<h3>' + data.question_2 + '</h3>';
+                    exerciseHtml += '<div class="options">';
+                    data.options_2.forEach(function(option) {
+                        exerciseHtml += '<div class="option-btn" data-answer="' + option + '">' + option + '</div>';
+                    });
+                    exerciseHtml += '</div>';
+                    break;
+                default:
+                    exerciseHtml += '<p>Unknown exercise type</p>';
+            }
+            exerciseHtml += '<div class="result"></div>';
+            exerciseHtml += '<button class="submit-answer">Submit Answer</button>';
+            exerciseHtml += '</div>';
+            exerciseHtml += '</div>';
 
-                exerciseHtml += '<div class="swiper-button-prev"></div>';
-                exerciseHtml += '<div class="swiper-button-next"></div>';
+            $('.infinite-container').html(exerciseHtml); // Заменяем предыдущий контент на новый
 
-                exerciseHtml += '</div>';
-
-                exerciseHtml += '<div class="exercise">';
-                switch (data.type) {
-                    case 'antonym_synonym':
-                        exerciseHtml += '<h3>' + data.question + '</h3>';
-                        exerciseHtml += '<ul>';
-                        data.options.forEach(function(option) {
-                            exerciseHtml += '<li>' + option + '</li>';
-                        });
-                        exerciseHtml += '</ul>';
-                        break;
-                    case 'grammar':
-                        exerciseHtml += '<h3>' + data.question + '</h3>';
-                        exerciseHtml += '<ul>';
-                        data.options.forEach(function(option) {
-                            exerciseHtml += '<li>' + option + '</li>';
-                        });
-                        exerciseHtml += '</ul>';
-                        break;
-                    case 'pronunciation':
-                        exerciseHtml += '<h3>Pronounce this word: ' + data.word + '</h3>';
-                        break;
-                    case 'idiom':
-                        exerciseHtml += '<h3>' + data.question + '</h3>';
-                        exerciseHtml += '<ul>';
-                        data.options.forEach(function(option) {
-                            exerciseHtml += '<li>' + option + '</li>';
-                        });
-                        exerciseHtml += '</ul>';
-                        break;
-                    case 'vocabulary':
-                        exerciseHtml += '<h3>' + data.question_1 + '</h3>';
-                        exerciseHtml += '<ul>';
-                        data.options_1.forEach(function(option) {
-                            exerciseHtml += '<li>' + option + '</li>';
-                        });
-                        exerciseHtml += '</ul>';
-                        exerciseHtml += '<h3>' + data.question_2 + '</h3>';
-                        exerciseHtml += '<ul>';
-                        data.options_2.forEach(function(option) {
-                            exerciseHtml += '<li>' + option + '</li>';
-                        });
-                        exerciseHtml += '</ul>';
-                        break;
-                    default:
-                        exerciseHtml += '<p>Unknown exercise type</p>';
+            var swiper = new Swiper('.swiper-container', {
+                direction: 'horizontal',
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
                 }
-                exerciseHtml += '</div>';
-                exerciseHtml += '</div>';
+            });
 
-                $('.infinite-container').html(exerciseHtml);
+            $('.option-btn').on('click', function() {
+                $('.option-btn').removeClass('selected');
+                $(this).addClass('selected');
+                selectedAnswer = $(this).data('answer');
+            });
 
-                // Initialize Swiper after rendering new content
-                var swiper = new Swiper('.swiper-container', {
-                    navigation: {
-                        nextEl: '.swiper-button-next',
-                        prevEl: '.swiper-button-prev',
-                    },
-                });
-            }
+            $('.submit-answer').on('click', function() {
+                if (selectedAnswer !== null) {
+                    var correctAnswer = data.correct_option;
+                    var isCorrect = (selectedAnswer === correctAnswer);
 
-            function loadExercise() {
-                $.ajax({
-                    url: window.location.href,
-                    dataType: 'json',
-                    success: function(data) {
-                        if (data.exercise) {
-                            renderExercise(data.exercise);
-
-                            if (data.has_next) {
-                                waypoint.enable();
-                            } else {
-                                waypoint.disable();
-                            }
+                    $('.option-btn').removeClass('selected');
+                    $('.option-btn').each(function() {
+                        if ($(this).data('answer') === selectedAnswer) {
+                            $(this).addClass('selected');
                         }
+                    });
+
+                    if (isCorrect) {
+                        $('.result').text('Correct!').css('color', 'green');
+                    } else {
+                        $('.result').text('Incorrect! The correct answer is: ' + correctAnswer).css('color', 'red');
                     }
-                });
+
+                    selectedAnswer = null;
+                } else {
+                    $('.result').text('Please select an option!').css('color', 'orange');
+                }
+            });
+
+            if (!firstLoad) {
+                $('.exercise-container').last()[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
-            var waypoint = new Waypoint({
+            setTimeout(function() {
+                waypoint.enable();
+            }, 500);
+        }
+
+        function initializeWaypoint() {
+            waypoint = new Waypoint({
                 element: $('.infinite-container')[0],
                 handler: function(direction) {
-                    if (direction === 'down') {
+                    if (direction === 'down' && !loading) {
+                        loading = true;
                         waypoint.disable();
                         loadExercise();
                     }
                 },
                 offset: 'bottom-in-view'
             });
+        }
 
-            // Load initial exercise
-            loadExercise();
-        });
-    </script>
+        function loadExercise() {
+            $.ajax({
+                url: window.location.href,
+                dataType: 'json',
+                success: function(data) {
+                    if (data.exercise) {
+                        renderExercise(data.exercise);
+
+                        if (data.has_next) {
+                            initializeWaypoint();
+                        } else {
+                            waypoint.disable();
+                        }
+                    }
+                    loading = false;
+                    firstLoad = false;
+
+                    // Прокрутить страницу к началу после загрузки нового контента
+                    window.scrollTo(0, 0);
+                },
+                error: function() {
+                    waypoint.enable();
+                    loading = false;
+                }
+            });
+        }
+
+        loadExercise();
+    });
+</script>
+
+
 </body>
 </html>
