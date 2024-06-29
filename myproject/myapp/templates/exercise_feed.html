@@ -24,80 +24,51 @@
             justify-content: center;
             border-bottom: 1px solid #ccc;
             box-sizing: border-box;
-            padding: 10px;
+            padding: 20px;
+            border-radius: 10px;
             margin-bottom: 20px;
+            background-color: #e6d3f5; /* background-color: #E6E6FA;*/
 
             position: relative; /* !!! Добавлено позиционирование */
         }
         .swiper-container {
             display: flex;
             width: 100%;
-            height: 400px; /* Адаптация высоты под содержимое */
+            height: 300px; /* Адаптация высоты под содержимое */
             margin-bottom: 10px;
             overflow: hidden;
         }
         .swiper-slide {
             background: #fff;
             overflow: hidden;
-            height: 100%;
+            height: 300px;
         }
         .swiper-slide video {
             width: 100%;
-            height: 100%;
+            height: 300px;
+            border: 4px solid #6a0dad; /* Purple border */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Box shadow for depth */
+            object-fit: cover; /* Ensure video covers the container */
+            box-sizing: border-box; /* Include border in element size */
+            padding: 6px; /* Increase padding to adjust for border */
         }
+
         .exercise {
             width: 100%;
-            text-align: center;
             box-sizing: border-box;
             padding: 10px;
-            background-color: #f9f9f9;
+            background-color: #e6d3f5; /*background-color: #f9f9f9;*/
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 10px;
-        }
-        .options-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .option-btn {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-        .option-btn:hover {
-            background-color: #e0e0e0;
-        }
-        .submit-answer {
-            padding: 12px 24px;
-            font-size: 18px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.3s ease;
-        }
-        .submit-answer:hover {
-            background-color: #45a049;
-        }
-        .result {
-            margin-top: 15px;
-            font-weight: bold;
         }
 
         /* Позиционирование кнопок навигации */
         .swiper-button-prev,
         .swiper-button-next {
             position: absolute;
-            top: 50%;
+            top: 180px; /*50%;*/
             transform: translateY(-50%);
             z-index: 10; /* Поднимаем кнопки наверх */
             cursor: pointer;
@@ -118,6 +89,70 @@
             right: 10px;
         }
 
+         /* Custom button styles */
+        .custom-button {
+            background-color: white;
+            /*border: 2px solid #6a0dad;  Dark purple border */
+            color: black; /* Dark purple text */
+            padding: 10px 20px;
+
+            font-size: 16px;
+            font-family: Montserrat, sans-serif; /* Montserrat font */
+            font-weight: 400; /* Regular weight */
+            line-height: 150%; /* Line height 150% */
+
+            border-radius: 5px; /* Slightly rounded corners */
+            cursor: pointer;
+            margin: 5px 0; /* Margin for spacing */
+            display: block; /* Ensure buttons stack vertically */
+            width: 150px; /* fit-content Fit the content */
+
+            /*text-align: center;  Center align text */
+            margin-left: auto; /* Center align button */
+            margin-right: auto; /* Center align button */
+        }
+
+        /* Hover and selected state */
+        .custom-button:hover, .custom-button.selected {
+            background-color: #6a0dad; /* Dark purple */
+            color: white;
+        }
+
+        /* Dropdown styles */
+        .custom-dropdown {
+            border: 2px solid #6a0dad; /* Dark purple border */
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px; /* Slightly rounded corners */
+            width: auto;
+            background-color: white;
+            color: #6a0dad; /* Dark purple text */
+        }
+
+        /* Submit button styles */
+        .submit-button {
+            background-color: #b19cd9; /* background-color: #6a0dad;  Dark purple */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px; /* Slightly rounded corners */
+            cursor: pointer;
+            display: block;
+            width: fit-content; /* Fit the content */
+            margin: 10px 0;
+            text-align: center; /* Center align text */
+            margin-left: auto; /* Center align button */
+            margin-right: auto; /* Center align button */
+        }
+
+        .submit-button:hover {
+            background-color: #7b1fa2; /* Темнее при наведении */
+        }
+
+        .submit-button:active {
+            background-color: #6a1b9a; /* Еще темнее при нажатии */
+        }
 
         /* Медиа-запросы для адаптации под мобильные устройства */
         @media (max-width: 768px) {
@@ -142,12 +177,14 @@
 
     <script>
     $(document).ready(function() {
+        console.log('Document ready');
         var selectedAnswer = null;
         var waypoint = null;
         var loading = false;
         var firstLoad = true; // Флаг для первой загрузки
 
         function renderExercise(data) {
+            console.log('Render exercise called with data:', data);
             var exerciseHtml = '<div class="exercise-container">';
 
             exerciseHtml += '<div class="swiper-container">';
@@ -155,20 +192,23 @@
             data.videos.forEach(function(video) {
                 exerciseHtml += '<div class="swiper-slide">';
                 exerciseHtml += '<video controls><source src="' + video.url + '" type="video/mp4"></video>';
+                if (data.videos.length > 1) {
+                    exerciseHtml += '<div class="swiper-button-prev"></div>';
+                    exerciseHtml += '<div class="swiper-button-next"></div>';
+                }
                 exerciseHtml += '</div>';
             });
             exerciseHtml += '</div>';
-            exerciseHtml += '<div class="swiper-button-prev"></div>';
-            exerciseHtml += '<div class="swiper-button-next"></div>';
             exerciseHtml += '</div>';
 
             exerciseHtml += '<div class="exercise">';
+            console.log(data.type);
             switch (data.type) {
                 case 'antonym_synonym':
                     exerciseHtml += '<h3>' + data.question + '</h3>';
                     exerciseHtml += '<div class="options">';
                     data.options.forEach(function(option) {
-                        exerciseHtml += '<div class="option-btn" data-answer="' + option + '">' + option + '</div>';
+                        exerciseHtml += '<div class="custom-button" data-answer="' + option + '">' + option + '</div>';
                     });
                     exerciseHtml += '</div>';
                     break;
@@ -176,81 +216,153 @@
                     exerciseHtml += '<h3>' + data.question + '</h3>';
                     exerciseHtml += '<div class="options">';
                     data.options.forEach(function(option) {
-                        exerciseHtml += '<div class="option-btn" data-answer="' + option + '">' + option + '</div>';
+                        exerciseHtml += '<div class="custom-button" data-answer="' + option + '">' + option + '</div>';
                     });
                     exerciseHtml += '</div>';
-                    break;
-                case 'pronunciation':
-                    exerciseHtml += '<h3>Pronounce this word: ' + data.word + '</h3>';
                     break;
                 case 'idiom':
                     exerciseHtml += '<h3>' + data.question + '</h3>';
                     exerciseHtml += '<div class="options">';
                     data.options.forEach(function(option) {
-                        exerciseHtml += '<div class="option-btn" data-answer="' + option + '">' + option + '</div>';
+                        exerciseHtml += '<div class="custom-button" data-answer="' + option + '">' + option + '</div>';
                     });
                     exerciseHtml += '</div>';
                     break;
                 case 'vocabulary':
                     exerciseHtml += '<h3>' + data.question_1 + '</h3>';
+                    exerciseHtml += '<h3>' + data.word_1 + '</h3>';
+
                     exerciseHtml += '<div class="options">';
                     data.options_1.forEach(function(option) {
-                        exerciseHtml += '<div class="option-btn" data-answer="' + option + '">' + option + '</div>';
+                        exerciseHtml += '<div class="custom-button" data-answer="' + option + '">' + option + '</div>';
                     });
                     exerciseHtml += '</div>';
-                    exerciseHtml += '<h3>' + data.question_2 + '</h3>';
-                    exerciseHtml += '<div class="options">';
-                    data.options_2.forEach(function(option) {
-                        exerciseHtml += '<div class="option-btn" data-answer="' + option + '">' + option + '</div>';
+                    break;
+                case 'fill_in_the_blank':
+                    exerciseHtml += '<p style="font-size: 16px; font-family: Montserrat, sans-serif; font-weight: 400; line-height: 150%; text-align: center;">';
+                    exerciseHtml += '<span class="part-before-blank">' + data.part_before_blank + '</span>';
+                    exerciseHtml += '<span class="blank">______</span>';
+                    exerciseHtml += '<span class="part-after-blank">' + data.part_after_blank + '</span>';
+                    exerciseHtml += '</p>';
+
+                    exerciseHtml += '<div class="options-container">';
+                    data.options.forEach(function(option) {
+                        exerciseHtml += '<div class="custom-button" data-answer="' + option + '">' + option + '</div>';
                     });
                     exerciseHtml += '</div>';
+                    break;
+                case 'guess_the_translation':
+                    exerciseHtml += '<p style="font-size: 16px; font-family: Montserrat, sans-serif; font-weight: 400; line-height: 150%; text-align: center;">';
+                    exerciseHtml += '<h3>Guess the translation of this word:</h3>';
+                    exerciseHtml += '<span class="eng-word">' + data.eng_word + '</span>';
+                    exerciseHtml += '</p>';
+
+                    exerciseHtml += '<div class="options-container" style="text-align: center; margin-top: 20px;">';
+                    data.options.forEach(function(option) {
+                        exerciseHtml += '<div class="custom-button" data-answer="' + option + '">' + option + '</div>';
+                    });
                     break;
                 default:
                     exerciseHtml += '<p>Unknown exercise type</p>';
             }
-            exerciseHtml += '<div class="result"></div>';
-            exerciseHtml += '<button class="submit-answer">Submit Answer</button>';
+            exerciseHtml += '<button class="submit-button">Submit Answer</button>';
             exerciseHtml += '</div>';
             exerciseHtml += '</div>';
 
             $('.infinite-container').html(exerciseHtml); // Заменяем предыдущий контент на новый
 
+            switch (data.type) {
+                case 'antonym_synonym':
+                case 'grammar':
+                case 'idiom':
+                case 'fill_in_the_blank':
+                case 'guess_the_translation':
+                case 'vocabulary':
+                    var customButtons = document.querySelectorAll('.custom-button');
+                    var correctAnswer = data.answer; // Получаем правильный ответ из данных упражнения
+
+                    // Функция для обработки клика на кнопку выбора
+                    function handleButtonClick() {
+                        var selectedAnswer = this.getAttribute('data-answer');
+
+                        // Очистка всех стилей выбора
+                        customButtons.forEach(function(btn) {
+                            btn.style.backgroundColor = '';
+                            btn.style.color = '';
+                        });
+
+                        // Выделение выбранного ответа
+                        this.style.backgroundColor = 'black'; // Зеленый цвет
+                        this.style.color = 'white';
+                    }
+
+                    // Назначаем обработчик на все кнопки выбора
+                    customButtons.forEach(function(button) {
+                        button.addEventListener('click', handleButtonClick);
+                    });
+
+                    // Обработка нажатия на кнопку сабмита
+                    var submitButton = document.querySelector('.submit-button');
+                    submitButton.addEventListener('click', function() {
+                        // Находим выбранную кнопку
+                        var selectedButton = document.querySelector('.custom-button[style*="background-color: black;"]');
+                        if (!selectedButton) {
+                            // Если ничего не выбрано, выходим
+                            return;
+                        }
+
+                        // Получаем ответ, выбранный пользователем
+                        var selectedAnswer = selectedButton.getAttribute('data-answer');
+
+                        console.log(selectedAnswer);
+
+                        // Сравниваем с правильным ответом
+                        if (selectedAnswer === correctAnswer) {
+                            // Правильный ответ
+                            selectedButton.style.backgroundColor = '#4CAF50'; // Зеленый цвет
+                            selectedButton.style.color = 'white';
+                        } else {
+                            // Неправильный ответ
+                            selectedButton.style.backgroundColor = '#f44336'; // Красный цвет
+                            selectedButton.style.color = 'white';
+
+                            // Находим и выделяем правильный ответ
+                            customButtons.forEach(function(btn) {
+                                if (btn.getAttribute('data-answer') === correctAnswer) {
+                                    btn.style.backgroundColor = '#4CAF50'; // Зеленый цвет
+                                    btn.style.color = 'white';
+                                }
+                            });
+                        }
+                    });
+                    break;
+                default:
+                    // Обработка для неизвестного типа упражнения
+                    break;
+            }
+
             var swiper = new Swiper('.swiper-container', {
-                direction: 'horizontal',
                 navigation: {
                     nextEl: '.swiper-button-next',
                     prevEl: '.swiper-button-prev',
-                }
-            });
-
-            $('.option-btn').on('click', function() {
-                $('.option-btn').removeClass('selected');
-                $(this).addClass('selected');
-                selectedAnswer = $(this).data('answer');
-            });
-
-            $('.submit-answer').on('click', function() {
-                if (selectedAnswer !== null) {
-                    var correctAnswer = data.correct_option;
-                    var isCorrect = (selectedAnswer === correctAnswer);
-
-                    $('.option-btn').removeClass('selected');
-                    $('.option-btn').each(function() {
-                        if ($(this).data('answer') === selectedAnswer) {
-                            $(this).addClass('selected');
+                },
+                on: {
+                    slideChangeTransitionStart: function() {
+                        var currentSlide = swiper.slides[swiper.activeIndex];
+                        var video = currentSlide.querySelector('video');
+                        if (video) {
+                            video.play();
                         }
-                    });
-
-                    if (isCorrect) {
-                        $('.result').text('Correct!').css('color', 'green');
-                    } else {
-                        $('.result').text('Incorrect! The correct answer is: ' + correctAnswer).css('color', 'red');
-                    }
-
-                    selectedAnswer = null;
-                } else {
-                    $('.result').text('Please select an option!').css('color', 'orange');
-                }
+                    },
+                    slideChangeTransitionEnd: function() {
+                        var previousSlide = swiper.slides[swiper.previousIndex];
+                        var video = previousSlide.querySelector('video');
+                        if (video) {
+                            video.pause();
+                            video.currentTime = 0;
+                        }
+                    },
+                },
             });
 
             if (!firstLoad) {
@@ -282,6 +394,7 @@
                 dataType: 'json',
                 success: function(data) {
                     if (data.exercise) {
+                        console.log('Data contains exercise:', data.exercise);
                         renderExercise(data.exercise);
 
                         if (data.has_next) {

@@ -12,18 +12,8 @@ class Video(models.Model):
     def __str__(self):
         return self.title
 
-"""
-class Exercise(models.Model):
-    video = models.ForeignKey(Video, related_name='exercises', on_delete=models.CASCADE)
-    question = models.CharField(max_length=255)
-    answer = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.question
-"""
-
 class BaseExercise(models.Model):
-    exercise_type = models.CharField(max_length=50)
+    exercise_type = models.CharField(max_length=50, default='')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -57,7 +47,7 @@ class GrammarExercise(BaseExercise):
     video_3 = models.ForeignKey('Video', on_delete=models.CASCADE, related_name='grammar_video_3')
     question = models.CharField(max_length=255)
     options = models.JSONField()  # A JSON field to store multiple choice options
-    correct_option = models.CharField(max_length=50)
+    answer = models.CharField(max_length=50)
 
     def get_videos(self):
         return [getattr(self, f'video_{i}') for i in range(1, 4)]
@@ -68,23 +58,7 @@ class GrammarExercise(BaseExercise):
             'videos': [{'url': video.video_file.url, 'title': video.title} for video in self.get_videos()],
             'question': self.question,
             'options': json.loads(self.options),
-            'correct_option': self.correct_option,
-        }
-
-class PronunciationExercise(BaseExercise):
-    video_1 = models.ForeignKey('Video', on_delete=models.CASCADE, related_name='pronunciation_video_1')
-    video_2 = models.ForeignKey('Video', on_delete=models.CASCADE, related_name='pronunciation_video_2')
-    video_3 = models.ForeignKey('Video', on_delete=models.CASCADE, related_name='pronunciation_video_3')
-    word = models.CharField(max_length=50)
-
-    def get_videos(self):
-        return [getattr(self, f'video_{i}') for i in range(1, 4)]
-
-    def serialize(self):
-        return {
-            'type': 'pronunciation',
-            'videos': [{'url': video.video_file.url, 'title': video.title} for video in self.get_videos()],
-            'word': self.word,
+            'answer': self.answer,
         }
 
 class IdiomExercise(BaseExercise):
@@ -94,7 +68,7 @@ class IdiomExercise(BaseExercise):
     video_4 = models.ForeignKey('Video', on_delete=models.CASCADE, related_name='idiom_video_4')
     question = models.CharField(max_length=255)
     options = models.JSONField()  # A JSON field to store multiple choice options
-    correct_option = models.CharField(max_length=50)
+    answer = models.CharField(max_length=50)
 
     def get_videos(self):
         return [getattr(self, f'video_{i}') for i in range(1, 5)]
@@ -105,19 +79,15 @@ class IdiomExercise(BaseExercise):
             'videos': [{'url': video.video_file.url, 'title': video.title} for video in self.get_videos()],
             'question': self.question,
             'options': json.loads(self.options),
-            'correct_option': self.correct_option,
+            'answer': self.answer,
         }
 
 class VocabularyExercise(BaseExercise):
     video = models.ForeignKey('Video', on_delete=models.CASCADE, related_name='vocabulary_video')
     word_1 = models.CharField(max_length=50)
-    word_2 = models.CharField(max_length=50)
     question_1 = models.CharField(max_length=255)
-    question_2 = models.CharField(max_length=255)
     options_1 = models.JSONField()  # A JSON field to store multiple choice options
-    options_2 = models.JSONField()  # A JSON field to store multiple choice options
-    correct_option_1 = models.CharField(max_length=50)
-    correct_option_2 = models.CharField(max_length=50)
+    answer = models.CharField(max_length=250)
 
     def get_videos(self):
         return [self.video]
@@ -127,11 +97,46 @@ class VocabularyExercise(BaseExercise):
             'type': 'vocabulary',
             'videos': [{'url': self.video.video_file.url, 'title': self.video.title}],
             'word_1': self.word_1,
-            'word_2': self.word_2,
             'question_1': self.question_1,
-            'question_2': self.question_2,
             'options_1': json.loads(self.options_1),
-            'options_2': json.loads(self.options_2),
-            'correct_option_1': self.correct_option_1,
-            'correct_option_2': self.correct_option_2,
+            'answer': self.answer,
+        }
+
+
+class FillInTheBlankExercise(BaseExercise):
+    video = models.ForeignKey('Video', on_delete=models.CASCADE, related_name='FITBE_video')
+    part_before_blank = models.CharField(max_length=250)
+    part_after_blank = models.CharField(max_length=250)
+    options = models.JSONField()
+    answer = models.CharField(max_length=255)
+
+    def get_videos(self):
+        return [self.video]
+
+    def serialize(self):
+        return {
+            'type': 'fill_in_the_blank',
+            'videos': [{'url': self.video.video_file.url, 'title': self.video.title}],
+            'options': json.loads(self.options),
+            'answer': self.answer,
+            'part_before_blank': self.part_before_blank,
+            'part_after_blank': self.part_after_blank,
+        }
+
+class GuessTheTranslationOfTheWord(BaseExercise):
+    video = models.ForeignKey('Video', on_delete=models.CASCADE, related_name='get_the_traslation')
+    options = models.JSONField()
+    eng_word = models.CharField(max_length=255, default='')
+    answer = models.CharField(max_length=255)
+
+    def get_videos(self):
+        return [self.video]
+
+    def serialize(self):
+        return {
+            'type': 'guess_the_translation',
+            'videos': [{'url': self.video.video_file.url, 'title': self.video.title}],
+            'options': json.loads(self.options),
+            'eng_word': self.eng_word,
+            'answer': self.answer,
         }

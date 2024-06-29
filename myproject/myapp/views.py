@@ -1,31 +1,14 @@
 from django.shortcuts import render, redirect
-from .models import Video, AntonymSynonymExercise, GrammarExercise, PronunciationExercise, IdiomExercise, VocabularyExercise
+from .models import Video, AntonymSynonymExercise, GrammarExercise, IdiomExercise, VocabularyExercise, FillInTheBlankExercise, GuessTheTranslationOfTheWord
 import json
 import random
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
 
-def index(request):
-    return render(request, 'index.html')
-
-def video_list(request):
-    video = Video.objects.create(
-        title='Video 1',
-        description='Video 1 Description',
-        video_file='videos/videoplayback (1).mp4'  # Путь к вашему видеофайлу в папке media
-    )
-
-    videos = Video.objects.all()
-    return render(request, 'video_list.html', {'videos': videos})
-
-def video_detail(request, pk):
-    video = Video.objects.get(pk=pk)
-    return render(request, 'video_detail.html', {'video': video})
-
 
 def get_random_exercise():
-    exercise_classes = [AntonymSynonymExercise, GrammarExercise, PronunciationExercise, IdiomExercise, VocabularyExercise]
+    exercise_classes = [AntonymSynonymExercise, GrammarExercise, IdiomExercise, VocabularyExercise, FillInTheBlankExercise, GuessTheTranslationOfTheWord]
     ExerciseClass = random.choice(exercise_classes)
     exercises = ExerciseClass.objects.all()
     if not exercises:
@@ -37,14 +20,6 @@ def exercise_feed(request):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         exercise = get_random_exercise()
         if exercise is not None:
-            """
-            videos = [{'url': video.video_file.url, 'title': video.title} for video in exercise.get_videos()]
-            exercise_data = {
-                'videos': videos,
-                'question': exercise.question,
-                'options': list(exercise.options)
-            }
-            """
             exercise_data = exercise.serialize()
             return JsonResponse({'exercise': exercise_data, 'has_next': True})
         else:
@@ -57,26 +32,137 @@ def create_exercises(request):
     video = Video.objects.create(
         title='Example Video',
         description='This is an example video.',
-        video_file='videos/videoplayback.mp4'  # Make sure this file exists in your media folder
+        video_file='videos/ensure assure.mp4'  # Make sure this file exists in your media folder
     )
 
-    video1 = Video.objects.create(
+    video_hotel = Video.objects.create(
         title='Example Video',
         description='This is an example video.',
-        video_file='videos/videoplayback (1).mp4'  # Make sure this file exists in your media folder
+        video_file='videos/hotel.mp4'  # Make sure this file exists in your media folder
     )
 
-    video2 = Video.objects.create(
+    video_vacation = Video.objects.create(
         title='Example Video',
         description='This is an example video.',
-        video_file='videos/videoplayback (2).mp4'  # Make sure this file exists in your media folder
+        video_file='videos/vacation.mp4'  # Make sure this file exists in your media folder
+    )
+
+    video_package = Video.objects.create(
+        title='Example Video',
+        description='This is an example video.',
+        video_file='videos/package.mp4'  # Make sure this file exists in your media folder
+    )
+
+    video_dime = Video.objects.create(
+        title='Example Video',
+        description='This is an example video.',
+        video_file='videos/a dime and dozen.mp4'  # Make sure this file exists in your media folder
+    )
+
+    video_bucks = Video.objects.create(
+        title='Example Video',
+        description='This is an example video.',
+        video_file='videos/big bucks.mp4'  # Make sure this file exists in your media folder
+    )
+
+    video_arm_leg = Video.objects.create(
+        title='Example Video',
+        description='This is an example video.',
+        video_file='videos/cost an arm and a leg.mp4'  # Make sure this file exists in your media folder
+    )
+
+    video_quote_price = Video.objects.create(
+        title='Example Video',
+        description='This is an example video.',
+        video_file='videos/quote a price.mp4'  # Make sure this file exists in your media folder
+    )
+
+    video_pp_fill = Video.objects.create(
+        title='Example Video',
+        description='This is an example video.',
+        video_file='videos/past perfect fill.mp4'  # Make sure this file exists in your media folder
+    )
+
+    video_keep_meaning = Video.objects.create(
+        title='Example Video',
+        description='This is an example video.',
+        video_file='videos/keep meaning.mp4'  # Make sure this file exists in your media folder
+    )
+
+    video_continue_meaning = Video.objects.create(
+        title='Example Video',
+        description='This is an example video.',
+        video_file='videos/continue meaning.mp4'  # Make sure this file exists in your media folder
+    )
+
+    video_going_to_aga = Video.objects.create(
+        title='Example Video',
+        description='This is an example video.',
+        video_file='videos/going to aga.mp4'  # Make sure this file exists in your media folder
+    )
+
+    video_will_aga = Video.objects.create(
+        title='Example Video',
+        description='This is an example video.',
+        video_file='videos/will aga.mp4'  # Make sure this file exists in your media folder
+    )
+
+    video_will_be_doing_aga = Video.objects.create(
+        title='Example Video',
+        description='This is an example video.',
+        video_file='videos/will be doing aga.mp4'  # Make sure this file exists in your media folder
+    )
+
+    # Create IdiomExercise
+    IdiomExercise.objects.create(
+        exercise_type='idiom',
+        video_1=video_dime,
+        video_2=video_bucks,
+        video_3=video_arm_leg,
+        video_4=video_quote_price,
+        question='What is the subject of the idioms in the videos',
+        options=json.dumps(['Money', "Health", "Justice", "Insurance"]),
+        answer='Money'
+    )
+
+    GuessTheTranslationOfTheWord.objects.create(
+        exercise_type='guess_the_translation',
+        video=video_hotel,
+        options=json.dumps(['машина', 'шафа', 'готель', 'карандаш']),
+        eng_word='hotel',
+        answer='готель',
+    )
+
+    GuessTheTranslationOfTheWord.objects.create(
+        exercise_type='guess_the_translation',
+        video=video_vacation,
+        options=json.dumps(['відпустка', 'шафа', 'готель', 'карандаш']),
+        eng_word='vacation',
+        answer='відпустка',
+    )
+
+    GuessTheTranslationOfTheWord.objects.create(
+        exercise_type='guess_the_translation',
+        video=video_package,
+        options=json.dumps(['машина', 'пакет', 'готель', 'карандаш']),
+        eng_word='package',
+        answer='пакет',
+    )
+
+    FillInTheBlankExercise.objects.create(
+        exercise_type='fill_in_the_blank',
+        video=video_pp_fill,
+        part_before_blank = 'I had been',
+        part_after_blank = 'before Marie called me.',
+        options = json.dumps(['done', 'making', 'sleeping', 'written']),
+        answer = 'sleeping',
     )
 
     # Create AntonymSynonymExercise
     AntonymSynonymExercise.objects.create(
         exercise_type='antonym_synonym',
-        video_1=video2,
-        video_2=video1,
+        video_1=video_continue_meaning,
+        video_2=video_keep_meaning,
         question='Are the words \"keep\" and \"continue\" antonyms or synonyms?',
         options=json.dumps(['antonyms', 'synonyms']),
         answer='synonyms'
@@ -85,33 +171,12 @@ def create_exercises(request):
     # Create GrammarExercise
     GrammarExercise.objects.create(
         exercise_type='grammar',
-        video_1=video2,
-        video_2=video,
-        video_3=video1,
+        video_1=video_going_to_aga,
+        video_2=video_will_aga,
+        video_3=video_will_be_doing_aga,
         question='Which sentence is grammatically correct?',
-        options=json.dumps(["I've just come", 'I had just come', 'I done just come']),
-        correct_option="I've just come"
-    )
-
-    # Create PronunciationExercise
-    PronunciationExercise.objects.create(
-        exercise_type='pronunciation',
-        video_1=video1,
-        video_2=video2,
-        video_3=video,
-        word='Ultimate'
-    )
-
-    # Create IdiomExercise
-    IdiomExercise.objects.create(
-        exercise_type='idiom',
-        video_1=video,
-        video_2=video1,
-        video_3=video2,
-        video_4=video,
-        question='What do the idioms in the videos mean?',
-        options=json.dumps(['To be very rich', "It's very cheap", "It's dangerous", "It's dangerous"]),
-        correct_option='To be very rich'
+        options=json.dumps(["Tom will be playing football all day next Sunday.", 'Tom will play football all day next Sunday.', 'Tom will have played football all day next Sunday.']),
+        answer="Tom will be playing football all day next Sunday."
     )
 
     # Create VocabularyExercise
@@ -119,80 +184,9 @@ def create_exercises(request):
         exercise_type='vocabulary',
         video=video,
         word_1='ensure',
-        word_2='insure',
         question_1='What does this word mean?',
-        question_2='What does this word mean?',
-        options_1=json.dumps(['Guarantee', 'Deny', 'Improve']),
-        options_2=json.dumps(['Make an insurance', 'Drive', 'Leave']),
-        correct_option_1='Guarantee',
-        correct_option_2='Make an insurance'
+        options_1=json.dumps(['take (something) away or off from the position occupied', 'make certain that (something) shall occur or be the case', 'leave or cause to leave a place or situation']),
+        answer='make certain that (something) shall occur or be the case',
     )
 
     return redirect('exercise_feed')
-
-def submit_antonym_synonym(request, exercise_id):
-    exercise = AntonymSynonymExercise.objects.get(id=exercise_id)
-    answer = request.POST.get('answer')
-    score = 1.0 if answer == exercise.answer else 0.0
-    return redirect('exercise_feed')
-
-def submit_grammar(request, exercise_id):
-    exercise = GrammarExercise.objects.get(id=exercise_id)
-    answer = request.POST.get('answer')
-    score = 1.0 if answer == exercise.correct_option else 0.0
-    return redirect('exercise_feed')
-
-def submit_pronunciation(request, exercise_id):
-    exercise = PronunciationExercise.objects.get(id=exercise_id)
-    # Implement pronunciation check logic
-    score = 1.0  # Placeholder score
-    return redirect('exercise_feed')
-
-def submit_idiom(request, exercise_id):
-    exercise = IdiomExercise.objects.get(id=exercise_id)
-    answer = request.POST.get('answer')
-    score = 1.0 if answer == exercise.correct_option else 0.0
-    return redirect('exercise_feed')
-
-def submit_vocabulary(request, exercise_id):
-    exercise = VocabularyExercise.objects.get(id=exercise_id)
-    answer_1 = request.POST.get('answer_1')
-    answer_2 = request.POST.get('answer_2')
-    score_1 = 1.0 if answer_1 == exercise.correct_option_1 else 0.0
-    score_2 = 1.0 if answer_2 == exercise.correct_option_2 else 0.0
-    return redirect('exercise_feed')
-
-
-"""
-    # Fetch random exercises for the feed
-    antonym_synonym_exercises = AntonymSynonymExercise.objects.all().order_by('?')[0]
-    grammar_exercises = GrammarExercise.objects.all().order_by('?')[0]
-    pronunciation_exercises = PronunciationExercise.objects.all().order_by('?')[0]
-    idiom_exercises = IdiomExercise.objects.all().order_by('?')[0]
-    vocabulary_exercises = VocabularyExercise.objects.all().order_by('?')[0]
-
-    context = [antonym_synonym_exercises, grammar_exercises, pronunciation_exercises, idiom_exercises, vocabulary_exercises]
-    return render(request, 'exercise_feed.html', {'exercises': context})
-
-    page = request.GET.get('page', 1)
-    paginator = Paginator(exercises_list, 5)  # Number of exercises per page
-
-    try:
-        exercises = paginator.page(page)
-    except PageNotAnInteger:
-        exercises = paginator.page(1)
-    except EmptyPage:
-        exercises = paginator.page(paginator.num_pages)
-
-    return render(request, 'exercise_feed.html', {'exercises': exercises})
-    """
-
-"""
-    context = {
-        'antonym_synonym_exercises': antonym_synonym_exercises,
-        'grammar_exercises': grammar_exercises,
-        'pronunciation_exercises': pronunciation_exercises,
-        'idiom_exercises': idiom_exercises,
-        'vocabulary_exercises': vocabulary_exercises,
-    }
-"""
